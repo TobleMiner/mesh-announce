@@ -8,23 +8,17 @@ import json
 import os
 from zlib import compress
 
-from gather import gather_data
+from gather import gather_providers, gather_data
 
 
-def get_handler(directory, env):
+def get_handler(providers, env):
     class ResponddUDPHandler(socketserver.BaseRequestHandler):
-        @staticmethod
-        def _get_provider_dir(provider):
-            return os.path.join(directory, "{}.d".format(provider))
-
         def multi_request(self, providers):
             ret = {}
             for provider in providers:
-                if '/' in provider:
-                    continue
                 try:
                     ret[provider] = gather_data(
-                        self._get_provider_dir(provider),
+                        providers[provider],
                         env
                     )
                 except:
@@ -38,9 +32,9 @@ def get_handler(directory, env):
 
             if data.startswith("GET "):
                 response = self.multi_request(data.split(" ")[1:])
-            elif '/' not in data:
+            else:
                 answer = gather_data(
-                    self._get_provider_dir(data),
+                    providers[data],
                     env
                 )
                 if answer:
@@ -65,17 +59,19 @@ if __name__ == "__main__":
                         action='append', metavar='<iface>',
                         help='interface on which the group is joined')
     parser.add_argument('-d', dest='directory',
-                        default='.', metavar='<dir>',
+                        default='./providers', metavar='<dir>',
                         help='data provider directory (default: $PWD)')
     parser.add_argument('-b', dest='batadv_iface',
                         default='bat0', metavar='<iface>',
                         help='batman-adv interface (default: bat0)')
     args = parser.parse_args()
 
+    providers = gather_providers(args.directory)
+
     socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
     server = socketserver.ThreadingUDPServer(
         ("", args.port),
-        get_handler(args.directory, {'batadv_dev': args.batadv_iface})
+        get_handler(providers, {'batadv_dev': args.batadv_iface})
     )
 
     if args.mcast_ifaces:
