@@ -8,19 +8,17 @@ import json
 import os
 from zlib import compress
 
-from gather import gather_providers, gather_data
+from providers import get_providers
 
 
 def get_handler(providers, env):
     class ResponddUDPHandler(socketserver.BaseRequestHandler):
-        def multi_request(self, providers):
+        def multi_request(self, providernames):
             ret = {}
-            for provider in providers:
+            for name in providernames:
                 try:
-                    ret[provider] = gather_data(
-                        providers[provider],
-                        env
-                    )
+                    provider = providers[name]
+                    ret[provider.name] = provider.call(env)
                 except:
                     pass
             return compress(str.encode(json.dumps(ret)))[2:-4]
@@ -33,10 +31,7 @@ def get_handler(providers, env):
             if data.startswith("GET "):
                 response = self.multi_request(data.split(" ")[1:])
             else:
-                answer = gather_data(
-                    providers[data],
-                    env
-                )
+                answer = providers[data].call(env)
                 if answer:
                     response = str.encode(json.dumps(answer))
 
@@ -66,12 +61,10 @@ if __name__ == "__main__":
                         help='batman-adv interface (default: bat0)')
     args = parser.parse_args()
 
-    providers = gather_providers(args.directory)
-
     socketserver.ThreadingUDPServer.address_family = socket.AF_INET6
     server = socketserver.ThreadingUDPServer(
         ("", args.port),
-        get_handler(providers, {'batadv_dev': args.batadv_iface})
+        get_handler(get_providers(args.directory), {'batadv_dev': args.batadv_iface})
     )
 
     if args.mcast_ifaces:
