@@ -1,12 +1,15 @@
 import os
 
+def _file_name_filter(fname):
+    return not (fname.startswith('__') or fname.startswith('.'))
+
 def source_dirs(dir):
     dirs = next(os.walk(dir))[1]
-    return filter(lambda d: not d.startswith('__'), dirs)
+    return filter(_file_name_filter, dirs)
 
 def modules(dir):
     return [os.path.splitext(f)[0] for f in next(os.walk(dir))[2]
-        if f.endswith('.py') and not f.startswith('__')]
+        if f.endswith('.py') and _file_name_filter(f)]
 
 def find_modules(base, *path):
     path_files = []
