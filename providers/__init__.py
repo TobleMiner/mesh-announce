@@ -38,11 +38,6 @@ def _set_value(node, path, value):
         node[path[0]] = {}
         _set_value(node[key], path[1:], value)
 
-
-def _compile_file(fname):
-    with open(fname) as file:
-        return compile(file.read(), os.path.abspath(fname), 'eval')
-
 class SourceCache():
     ''' Simple singleton-based cache
     '''
