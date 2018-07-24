@@ -20,6 +20,3 @@ class Source(providers.DataSource):
                 open('/sys/kernel/debug/batman_adv/{}/originators'.format(batadv_dev)))
             if line[0] == line[3]
         ])
-
-def get_source():
-    return Source()

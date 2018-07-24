@@ -79,6 +79,11 @@ class SourceCache():
 
         return self.cache[key].value
 
+class InvalidSourceModuleExeption(Exception):
+    def __init__(self, path):
+        super().__init__(self, 'Invalid data source,' +
+            ' module at "{}" does not spcify required member "Source"')
+
 class Source():
     @classmethod
     def from_file(cls, modulepath, jsonpath):
@@ -86,7 +91,10 @@ class Source():
         relpath = '.'.join([''] + modulepath)
         # import modules relative to this package
         module = import_module(relpath, __package__)
-        return Source(jsonpath, module.get_source())
+        if not module.Source:
+            raise InvalidSourceModuleExeption(relpath)
+
+        return Source(jsonpath, module.Source())
 
     def __init__(self, path, source):
         self.path = path

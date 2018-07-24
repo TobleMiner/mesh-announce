@@ -7,6 +7,3 @@ class Source(providers.DataSource):
             for key, value in map(lambda s: map(str.strip, s.split(': ', 1)), open('/proc/meminfo').readlines())
             if key in ('MemTotal', 'MemFree', 'Buffers', 'Cached')
         )
-
-def get_source():
-    return Source()

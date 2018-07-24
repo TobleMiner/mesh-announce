@@ -24,7 +24,3 @@ class Source(providers.DataSource):
                 glob('/sys/class/net/{}/upper_*'.format(batadv_dev))
             ))
         )
-
-def get_source():
-    return Source()
-

@@ -7,6 +7,3 @@ class Source(providers.DataSource):
 
     def call(self, batadv_dev):
         return open('/sys/class/net/' + batadv_dev + '/address').read().strip().replace(':', '')
-
-def get_source():
-    return Source()

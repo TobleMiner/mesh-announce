@@ -19,6 +19,3 @@ class Source(providers.DataSource):
                 }
             }
         }
-
-def get_source():
-    return Source()

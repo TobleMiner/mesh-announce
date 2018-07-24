@@ -22,7 +22,3 @@ class Source(providers.DataSource):
             )
             for key, value in map(lambda s: list(map(str.strip, s.split(': ', 1))), call(['ethtool', '-S', batadv_dev])[1:])
         ))
-
-def get_source():
-    return Source()
-
