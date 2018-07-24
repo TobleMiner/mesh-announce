@@ -45,7 +45,7 @@ class SourceCache():
         def __init__(self, key, value, ttl):
             self.key = key
             self.value = value
-            self.expiry = time.time() + ttl
+            self.expiry = time.monotonic() + ttl
 
         def isvalid(self):
             return time.time() < self.expiry
