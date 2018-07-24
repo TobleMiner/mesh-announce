@@ -11,9 +11,7 @@ def modules(dir):
 def find_modules(base, *path):
     path_files = []
     dir_abs = base
-    for dir in path:
-        dir_abs = os.path.join(dir_abs, dir)
-
+    dir_abs = os.path.join(base, *path)
     dirs = source_dirs(dir_abs)
     for dir in dirs:
         # Ugly hack because python < 3.5 does not support arguments after asterisk expression
